@@ -12,6 +12,11 @@ if [ ! -z "$SERVICE_CONFIG" ]; then
   echo "Registering service with consul $SERVICE_CONFIG"
   consul services register ${SERVICE_CONFIG}
   
+  if [ $? != 0 ]; then
+    echo "Registering config for file:"
+    cat ${file}
+  fi
+  
   # make sure the service deregisters when exit
   trap "consul services deregister ${SERVICE_CONFIG}" SIGINT SIGTERM EXIT
 fi
@@ -23,6 +28,11 @@ if [ ! -z "$CENTRAL_CONFIG" ]; then
   for i in "${configs[@]}"; do
     echo "Register central config $i"
     consul config write $i
+      
+    if [ $? != 0 ]; then
+      echo "Registering config for file:"
+      cat ${file}
+    fi
   done
 fi
 
@@ -33,10 +43,20 @@ if [ ! -z "$CENTRAL_CONFIG_DIR" ]; then
 
     if [[ "${file#*.}" == "hcl" ]]; then
       consul config write $file
+
+      if [ $? != 0 ]; then
+        echo "Registering config for file:"
+        cat ${file}
+      fi
     fi
     
     if [[ "${file#*.}" == "json" ]]; then
 	    curl -s -XPUT -d @$file ${CONSUL_HTTP_ADDR}/v1/config 
+  
+      if [ $? != 0 ]; then
+        echo "Registering config for file:"
+        cat ${file}
+      fi
     fi
   done
 fi
