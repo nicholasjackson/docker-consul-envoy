@@ -24,7 +24,7 @@ docker run --rm \
 When the container starts a service config specified in the environment variable will be registered with Consul, when the container
 exits the service will be de-registered.
 
-### CENTRAL_CONFIG - comma separated list of central config files
+### CENTRAL_CONFIG - ; separated list of central config files
 When the container starts any central config file referenced in the environment variable will automatically be registered
 with Consul. On exit this configuration is not removed.
 
