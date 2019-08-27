@@ -10,7 +10,7 @@ docker run --rm \
   -e "CONSUL_GRPC_ADDR=10.5.0.2:8502" \
   -e "SERVICE_CONFIG=/config/web.json" \
   -v $(pwd)/service_config:/config \
-  nicholasjackson/consul-envoy:v1.6.0-beta3-v0.10.0 \
+  nicholasjackson/consul-envoy:v1.6.0-v0.10.0 \
   bash -c "consul connect envoy -sidecar-for web-v1"
 ```
 
