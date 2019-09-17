@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+
+  consul:
+    image: consul:1.6.0
+    command: ["consul", "agent", "-config-file=/config/consul-single-dc.hcl", "-config-dir=/config"]
+    volumes:
+    - "./consul_config:/config"
+    ports:
+    - 8500:8500
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.2
+
+  test_register:
+    build:
+      context: ../
+    environment:
+      CONSUL_HTTP_ADDR: 10.5.0.2:8500
+      CONSUL_GRPC_ADDR: 10.5.0.2:8502
+      SERVICE_CONFIG: /config/web_v1.hcl
+      CENTRAL_CONFIG_DIR: /central_config_dir
+      CENTRAL_CONFIG: "/central_config_files/currency-defaults.hcl;/central_config_files/payments-defaults.json"
+    volumes:
+    - "./service_config:/config"
+    - "./central_config_files:/central_config_files"
+    - "./central_config_dir:/central_config_dir"
+    command: ["consul", "connect", "envoy", "-sidecar-for", "web-v1", "--", "-l", "debug"]
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.3
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.5.0.0/16

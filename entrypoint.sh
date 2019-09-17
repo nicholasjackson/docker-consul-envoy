@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Wait until Consul can be contacted
 until consul members; do
@@ -13,7 +13,7 @@ if [ ! -z "$SERVICE_CONFIG" ]; then
   consul services register ${SERVICE_CONFIG}
   
   if [ $? != 0 ]; then
-    echo "Registering config for file:"
+    echo "Error registering service config:"
     cat ${file}
   fi
   
@@ -26,11 +26,11 @@ if [ ! -z "$CENTRAL_CONFIG" ]; then
   IFS=';' read -r -a configs <<< ${CENTRAL_CONFIG}
 
   for i in "${configs[@]}"; do
-    echo "Register central config $i"
+    echo "Writing central config $i"
     consul config write $i
       
     if [ $? != 0 ]; then
-      echo "Registering config for file:"
+      echo "Error writing config:"
       cat ${file}
     fi
   done
@@ -38,14 +38,14 @@ fi
 
 # register any central config from a folder
 if [ ! -z "$CENTRAL_CONFIG_DIR" ]; then
-  for file in $CENTRAL_CONFIG_DIR/*; do 
-    echo "Register central config $file"
+  for file in `ls -v $CENTRAL_CONFIG_DIR/*`; do 
+    echo "Writing central config $file"
 
     if [[ "${file#*.}" == "hcl" ]]; then
       consul config write $file
 
       if [ $? != 0 ]; then
-        echo "Registering config for file:"
+        echo "Error writing config:"
         cat ${file}
       fi
     fi
@@ -54,7 +54,7 @@ if [ ! -z "$CENTRAL_CONFIG_DIR" ]; then
 	    curl -s -XPUT -d @$file ${CONSUL_HTTP_ADDR}/v1/config 
   
       if [ $? != 0 ]; then
-        echo "Registering config for file:"
+        echo "Error writing config:"
         cat ${file}
       fi
     fi
@@ -62,8 +62,8 @@ if [ ! -z "$CENTRAL_CONFIG_DIR" ]; then
 fi
 
 # Run the command if specified
-echo "Command: $@"
 if [ "$#" -ne 0 ]; then
+  echo "Running command: $@"
   exec "$@" &
 
   # Block using tail so the trap will fire
