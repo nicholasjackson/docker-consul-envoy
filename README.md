@@ -33,8 +33,8 @@ When the container starts all central config in the folder referenced by the env
 registered with Consul. On ext this configuration is not removed.
 
 ## Example of using this container with a Kubernetes job to load central config
-Example is shown as Terraform code but this example will also work with pure kubernetes yaml
 
+### Terraform
 ```
 resource "kubernetes_config_map" "central_config" {
   metadata {
@@ -103,4 +103,67 @@ resource "kubernetes_job" "central_config" {
 }
 ```
 
+### YAML
 
+```
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: central-config-split
+data:
+  1_web_defaults.yml: |
+    kind = "service-defaults"
+    name = "web"
+    protocol = "http"
+  2_api_defaults.yml: |
+    kind = "service-defaults"
+    name = "api"
+    protocol = "http"
+  3_api_resolver.yml: |
+    kind = "service-resolver"
+    name = "api"
+
+    # https://www.consul.io/api/health.html#filtering-2
+    # # Show Node.Meta demonstration showing performance testing a new instance type
+    default_subset = "v1"
+
+    subsets = {
+      v1 = {
+        filter = "Service.Meta.version == 1"
+      }
+      v2 = {
+        filter = "Service.Meta.version == 2"
+      }
+    }
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: central-config-split
+  labels:
+    app: central-config-split
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+      - name: central-config
+        configMap:
+          name: central-config-split
+      containers:
+      - name: central-config-split
+        image: "nicholasjackson/consul-envoy:v1.6.0-v0.10.0"
+        env:
+        - name: "CONSUL_HTTP_ADDR"
+          value: "consul-consul-server:8500"
+        - name: "CONSUL_GRPC_ADDR"
+          value: "consul-consul-server:8502"
+        - name: "CENTRAL_CONFIG_DIR"
+          value: "/config"
+        volumeMounts:
+        - name: "central-config"
+          readOnly: true
+          mountPath: "/config"
+```
