@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 # Wait until Consul can be contacted
 until consul members; do
@@ -12,9 +12,12 @@ if [ ! -z "$SERVICE_CONFIG" ]; then
   echo "Registering service with consul $SERVICE_CONFIG"
   consul services register ${SERVICE_CONFIG}
   
-  if [ $? != 0 ]; then
-    echo "Error registering service config:"
-    cat ${file}
+  exit_status=$?
+  if [ $exit_status -ne 0 ]; then
+    echo "### Error writing service config: $file ###"
+    cat $file
+    echo ""
+    exit 1
   fi
   
   # make sure the service deregisters when exit
@@ -25,13 +28,16 @@ fi
 if [ ! -z "$CENTRAL_CONFIG" ]; then
   IFS=';' read -r -a configs <<< ${CENTRAL_CONFIG}
 
-  for i in "${configs[@]}"; do
-    echo "Writing central config $i"
-    consul config write $i
-      
-    if [ $? != 0 ]; then
-      echo "Error writing config:"
-      cat ${file}
+  for file in "${configs[@]}"; do
+    echo "Writing central config $file"
+    consul config write $file
+     
+    exit_status=$?
+    if [ $exit_status -ne 0 ]; then
+      echo "### Error writing central config: $file ###"
+      cat $file
+      echo ""
+      exit 1
     fi
   done
 fi
@@ -40,23 +46,15 @@ fi
 if [ ! -z "$CENTRAL_CONFIG_DIR" ]; then
   for file in `ls -v $CENTRAL_CONFIG_DIR/*`; do 
     echo "Writing central config $file"
+    consul config write $file
+    echo ""
 
-    if [[ "${file#*.}" == "hcl" ]]; then
-      consul config write $file
-
-      if [ $? != 0 ]; then
-        echo "Error writing config:"
-        cat ${file}
-      fi
-    fi
-    
-    if [[ "${file#*.}" == "json" ]]; then
-	    curl -s -XPUT -d @$file ${CONSUL_HTTP_ADDR}/v1/config 
-  
-      if [ $? != 0 ]; then
-        echo "Error writing config:"
-        cat ${file}
-      fi
+    exit_status=$?
+    if [ $exit_status -ne 0 ]; then
+      echo "### Error writing central config: $file ###"
+      cat $file
+      echo ""
+      exit 1
     fi
   done
 fi
