@@ -1,4 +1,4 @@
-FROM envoyproxy/envoy-alpine:v1.14.2
+FROM envoyproxy/envoy-alpine:v1.13.2
 
 ENV CONSUL_HTTP_ADDR=http://localhost:8500
 
