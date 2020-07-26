@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Wait until Consul can be contacted
-until curl -s ${CONSUL_HTTP_ADDR}/v1/status/leader | grep 8300; do
+until curl -s -k ${CONSUL_HTTP_ADDR}/v1/status/leader | grep 8300; do
   echo "Waiting for Consul to start"
   sleep 1
 done

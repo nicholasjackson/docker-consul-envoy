@@ -1,6 +1,6 @@
 #!/bin/bash
 
-consul_version=("1.8.0" "1.7.4" "1.7.2")
+consul_version=("1.8.0" "1.7.4" "1.7.3" "1.7.2")
 envoy_version=("1.14.2" "1.13.2" "1.13.1" "1.12.4" "1.12.3" "1.11.2" "1.10.0")
 
 for c in ${consul_version[@]};do
