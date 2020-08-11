@@ -4,7 +4,7 @@ routes = [
   {
     match {
       http {
-        query_param = [
+        header = [
           {
             name  = "x-version"
             exact = "1"
