@@ -16,10 +16,31 @@ Every Consul / Envoy combination is run against a fresh cluster and application,
 
 ```
 ➜ ./test.sh 
+
 Testing Consul Envoy Compatibility
 
 Consul Version | Envoy Version | Result
 -------------- | ------------- | ------
+         1.8.3 |        1.15.0 | FAIL
+         1.8.3 |        1.14.4 | PASS
+         1.8.3 |        1.14.2 | PASS
+         1.8.3 |        1.13.2 | PASS
+         1.8.3 |        1.13.1 | PASS
+         1.8.3 |        1.12.4 | PASS
+         1.8.3 |        1.12.3 | PASS
+         1.8.3 |        1.11.2 | PASS
+         1.8.3 |        1.10.0 | FAIL
+         1.8.2 |        1.15.0 | FAIL
+         1.8.2 |        1.14.4 | PASS
+         1.8.2 |        1.14.2 | PASS
+         1.8.2 |        1.13.2 | PASS
+         1.8.2 |        1.13.1 | PASS
+         1.8.2 |        1.12.4 | PASS
+         1.8.2 |        1.12.3 | PASS
+         1.8.2 |        1.11.2 | PASS
+         1.8.2 |        1.10.0 | FAIL
+         1.8.0 |        1.15.0 | FAIL
+         1.8.0 |        1.14.4 | FAIL
          1.8.0 |        1.14.2 | FAIL
          1.8.0 |        1.13.2 | FAIL
          1.8.0 |        1.13.1 | FAIL
@@ -27,6 +48,8 @@ Consul Version | Envoy Version | Result
          1.8.0 |        1.12.3 | PASS
          1.8.0 |        1.11.2 | PASS
          1.8.0 |        1.10.0 | FAIL
+         1.7.2 |        1.15.0 | FAIL
+         1.7.2 |        1.14.4 | FAIL
          1.7.2 |        1.14.2 | FAIL
          1.7.2 |        1.13.2 | FAIL
          1.7.2 |        1.13.1 | FAIL

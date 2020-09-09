@@ -6,8 +6,8 @@ echo ""
 echo "Consul Version | Envoy Version | Result"
 echo "-------------- | ------------- | ------"
 
-consul_version=("1.8.0" "1.7.2")
-envoy_version=("1.14.2" "1.13.2" "1.13.1" "1.12.4" "1.12.3" "1.11.2" "1.10.0")
+consul_version=("1.8.3" "1.8.2" "1.8.0" "1.7.2")
+envoy_version=("1.15.0" "1.14.4" "1.14.2" "1.13.2" "1.13.1" "1.12.4" "1.12.3" "1.11.2" "1.10.0")
 
 #consul_version=("1.8.0")
 #envoy_version=("1.11.2")
