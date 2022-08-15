@@ -2,11 +2,11 @@ kind = "service-splitter"
 name = "backend"
 splits = [
   {
-    weight         = 10
+    weight         = 100
     service_subset = "v1"
   },
   {
-    weight         = 90
+    weight         = 0
     service_subset = "v2"
   },
 ]
