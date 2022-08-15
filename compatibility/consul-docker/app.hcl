@@ -119,7 +119,7 @@ sidecar "backend_1_envoy" {
   
   env {
     key = "CENTRAL_CONFIG"
-    value = "/files/proxy_defaults.hcl;/files/resolver.hcl;/files/router.hcl"
+    value = "/files/proxy_defaults.hcl;/files/resolver.hcl;/files/router.hcl;/files/splitter.hcl"
   }
   
   env {
