@@ -1,3 +1,8 @@
+###########################################################################
+# To utilize this Action to build images and publish them to GHCR,
+# copy this file to .github/workflows in your repository and commit/push!
+###########################################################################
+
 name: Docker
 
 # This workflow uses actions that are not certified by GitHub.
@@ -10,8 +15,6 @@ on:
     branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "main" ]
 
 env:
   # Use docker.io for Docker Hub if empty
