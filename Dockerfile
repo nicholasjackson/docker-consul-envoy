@@ -1,9 +1,16 @@
-ARG ENVOY_VERSION
-ARG CONSUL_VERSION
+### CONFIGURATION ###
+#
+# These values will be used by the Github Action to build images.
+# Modify these in a PR, merge them, and push a tag with format 'v<YOUR_VERSION_HERE>' to auto-build a new image!
+#
+ARG ENVOY_IMAGE=envoyproxy/envoy:v1.23.1
+ARG CONSUL_IMAGE=hashicorp/consul:1.13.1
+#
+### END CONFIGURATION ###
 
-FROM envoyproxy/envoy:v${ENVOY_VERSION} as envoy-bin
+FROM ${ENVOY_IMAGE} as envoy-bin
 
-FROM consul:${CONSUL_VERSION} as consul-bin
+FROM ${CONSUL_IMAGE} as consul-bin
 
 FROM ubuntu 
 
