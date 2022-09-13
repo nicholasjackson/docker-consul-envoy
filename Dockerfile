@@ -1,7 +1,6 @@
 ### CONFIGURATION ###
 #
-# These values will be used by the Github Action to build images.
-# Modify these in a PR, merge them, and push a tag with format 'v<YOUR_VERSION_HERE>' to auto-build a new image!
+# These default values can be used by a Github Action to build images, if enabled.
 #
 ARG ENVOY_IMAGE=envoyproxy/envoy:v1.23.1
 ARG CONSUL_IMAGE=hashicorp/consul:1.13.1
