@@ -42,6 +42,9 @@ function build_containers() {
              . \
           	--push
 
+          echo "Signing with CoSign, verification of this image should use the following public key"
+          cosign public-key
+          echo ""
           cosign sign $DOCKERHUB_REPO:$c-$e
         fi
   	  done

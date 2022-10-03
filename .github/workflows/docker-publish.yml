@@ -15,17 +15,22 @@ jobs:
         run: |-
           # Get latest envoy version
           CONSUL_VERSION=$(curl -s https://registry.hub.docker.com/v2/repositories/library/consul/tags  | jq -r '.results[]["name"]' | sed s/"latest"// | sort -V -r | head -n 1)
+          ENVOY_VERSION=$(curl -s https://registry.hub.docker.com/v2/repositories/envoyproxy/envoy/tags  | jq -r '.results[]["name"]' | sed s/"latest"// | sort -V -r | head -n 1)
           RELEASE_VERSION=$(curl --silent "https://api.github.com/repos/nicholasjackson/docker-consul-envoy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
           echo "::set-output name=consul::$CONSUL_VERSION"
+          echo "::set-output name=envoy::$ENVOY_VERSION"
           echo "::set-output name=release::$RELEASE_VERSION"
+          echo "::set-output name=latest::$CONSUL_VERSION-$ENVOY_VERSION"
     outputs:
       consul: ${{steps.tag.outputs.consul}}
-      release: ${{steps.tag.outputs.repo}}
+      envoy: ${{steps.tag.outputs.envoy}}
+      release: ${{steps.tag.outputs.release}}
+      latest: ${{steps.tag.outputs.latest}}
 
   build:
     needs: version
-    if: needs.version.outputs.consul != needs.version.outputs.release
+    if: needs.version.outputs.latest != needs.version.outputs.release
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -64,4 +69,4 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{needs.version.outputs.consul}}
+          tag_name: ${{needs.version.outputs.latest}}
