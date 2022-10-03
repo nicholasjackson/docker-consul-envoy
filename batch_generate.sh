@@ -42,7 +42,7 @@ function build_containers() {
              . \
           	--push
 
-          cosign sign $DOCKERHUB_REPO/consul-envoy:$c-$e
+          cosign sign $DOCKERHUB_REPO:$c-$e
         fi
   	  done
     fi
