@@ -1,0 +1,73 @@
+name: Build Images
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get Consul Version
+        id: tag
+        run: |-
+          # Get latest envoy version
+          CONSUL_VERSION=$(curl -s https://registry.hub.docker.com/v2/repositories/library/consul/tags  | jq -r '.results[]["name"]' | sed s/"latest"// | sort -V -r | head -n 1)
+          ENVOY_VERSION=$(curl -s https://registry.hub.docker.com/v2/repositories/envoyproxy/envoy/tags  | jq -r '.results[]["name"]' | sed s/"latest"// | sort -V -r | head -n 1)
+          RELEASE_VERSION=$(curl --silent "https://api.github.com/repos/nicholasjackson/docker-consul-envoy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+
+          echo "::set-output name=consul::$CONSUL_VERSION"
+          echo "::set-output name=envoy::$ENVOY_VERSION"
+          echo "::set-output name=release::$RELEASE_VERSION"
+          echo "::set-output name=latest::$CONSUL_VERSION-$ENVOY_VERSION"
+    outputs:
+      consul: ${{steps.tag.outputs.consul}}
+      envoy: ${{steps.tag.outputs.envoy}}
+      release: ${{steps.tag.outputs.release}}
+      latest: ${{steps.tag.outputs.latest}}
+
+  build:
+    needs: version
+    if: needs.version.outputs.latest != needs.version.outputs.release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out Repository
+        uses: actions/checkout@v3
+
+      # Install the cosign tool except on PR
+      # https://github.com/sigstore/cosign-installer
+      - name: Install Cosign
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@7e0881f8fe90b25e305bbf0309761e9314607e25
+        with:
+          cosign-release: 'v1.9.0'
+
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log Into Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          username: nicholasjackson
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Build and Sign the Docker images
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: ./batch_generate.sh
+      
+      - name: Create Release
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{needs.version.outputs.latest}}
+          token: ${{ secrets.GH_TOKEN }}
