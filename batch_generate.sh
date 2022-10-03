@@ -3,7 +3,7 @@
 DOCKERHUB_REPO="nicholasjackson/consul-envoy"
 
 CONSUL_REPO="hashicorp/consul"
-CONSUL_ENTERPRISE_REPO="hashicorp/consul"
+CONSUL_ENTERPRISE_REPO="hashicorp/consul-enterprise"
 ENVOY_REPO="envoyproxy/envoy"
 
 CONSUL_VERSION=$(curl https://registry.hub.docker.com/v2/repositories/library/consul/tags  | jq -r '.results[]["name"]' | sort -V -r)
